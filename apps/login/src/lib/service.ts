@@ -26,6 +26,8 @@ export async function createServiceForHost<T extends ServiceClass>(
 ) {
   let token;
 
+  console.log(JSON.stringify(process.env));
+
   // if we are running in a multitenancy context, use the system user token
   if (
     process.env.AUDIENCE &&
@@ -42,7 +44,6 @@ export async function createServiceForHost<T extends ServiceClass>(
   }
 
   if (!token) {
-    console.log(JSON.stringify(process.env));
     throw new Error("No token found here");
   }
 

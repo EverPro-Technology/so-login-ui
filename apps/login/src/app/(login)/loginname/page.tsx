@@ -1,25 +1,24 @@
-import { DynamicTheme } from "@/components/dynamic-theme";
-import { SignInWithIdp } from "@/components/sign-in-with-idp";
-import { UsernameForm } from "@/components/username-form";
-import { getServiceUrlFromHeaders } from "@/lib/service";
+import {DynamicTheme} from "@/components/dynamic-theme";
+import {SignInWithIdp} from "@/components/sign-in-with-idp";
+import {UsernameForm} from "@/components/username-form";
+import {getServiceUrlFromHeaders} from "@/lib/service";
 import {
-  getActiveIdentityProviders,
-  getBrandingSettings,
-  getDefaultOrg,
-  getLoginSettings,
+    getActiveIdentityProviders,
+    getBrandingSettings,
+    getDefaultOrg,
+    getLoginSettings,
 } from "@/lib/zitadel";
-import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
-import { getLocale, getTranslations } from "next-intl/server";
-import { headers } from "next/headers";
+import {Organization} from "@zitadel/proto/zitadel/org/v2/org_pb";
+import {getLocale, getTranslations} from "next-intl/server";
+import {headers} from "next/headers";
 
 export default async function Page(props: {
-  searchParams: Promise<Record<string | number | symbol, string | undefined>>;
+    searchParams: Promise<Record<string | number | symbol, string | undefined>>;
 }) {
-  
-  try {
+
     const searchParams = await props.searchParams;
     const locale = getLocale();
-    const t = await getTranslations({ locale, namespace: "loginname" });
+    const t = await getTranslations({locale, namespace: "loginname"});
 
     const loginName = searchParams?.loginName;
     const requestId = searchParams?.requestId;
@@ -28,71 +27,70 @@ export default async function Page(props: {
     const submit: boolean = searchParams?.submit === "true";
 
     const _headers = await headers();
-    const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+    const {serviceUrl} = getServiceUrlFromHeaders(_headers);
 
     let defaultOrganization;
     if (!organization) {
-      const org: Organization | null = await getDefaultOrg({
-        serviceUrl,
-      });
-      if (org) {
-        defaultOrganization = org.id;
-      }
+        const org: Organization | null = await getDefaultOrg({
+            serviceUrl,
+        });
+        if (org) {
+            defaultOrganization = org.id;
+        }
     }
 
+    console.log("defaultOrganization", defaultOrganization);
     const loginSettings = await getLoginSettings({
-      serviceUrl,
-      organization: organization ?? defaultOrganization,
+        serviceUrl,
+        organization: organization ?? defaultOrganization,
     });
+    console.log("loginSettings", loginSettings);
 
     const contextLoginSettings = await getLoginSettings({
-      serviceUrl,
-      organization,
+        serviceUrl,
+        organization,
     });
+    console.log("contextLoginSettings", contextLoginSettings);
 
     const identityProviders = await getActiveIdentityProviders({
-      serviceUrl,
-      orgId: organization ?? defaultOrganization,
+        serviceUrl,
+        orgId: organization ?? defaultOrganization,
     }).then((resp) => {
-      return resp.identityProviders;
+        return resp.identityProviders;
     });
 
+    console.log("identityProviders", identityProviders);
+
     const branding = await getBrandingSettings({
-      serviceUrl,
-      organization: organization ?? defaultOrganization,
+        serviceUrl,
+        organization: organization ?? defaultOrganization,
     });
+    console.log("branding", branding);
 
     return (
         <DynamicTheme branding={branding}>
-          <div className="flex flex-col items-center space-y-4">
-            <h1>{t("title")}</h1>
-            <p className="ztdl-p">{t("description")}</p>
+            <div className="flex flex-col items-center space-y-4">
+                <h1>{t("title")}</h1>
+                <p className="ztdl-p">{t("description")}</p>
 
-            <UsernameForm
-                loginName={loginName}
-                requestId={requestId}
-                organization={organization} // stick to "organization" as we still want to do user discovery based on the searchParams not the default organization, later the organization is determined by the found user
-                loginSettings={contextLoginSettings}
-                suffix={suffix}
-                submit={submit}
-                allowRegister={!!loginSettings?.allowRegister}
-            >
-              {identityProviders && (
-                  <SignInWithIdp
-                      identityProviders={identityProviders}
-                      requestId={requestId}
-                      organization={organization}
-                  ></SignInWithIdp>
-              )}
-            </UsernameForm>
-          </div>
+                <UsernameForm
+                    loginName={loginName}
+                    requestId={requestId}
+                    organization={organization} // stick to "organization" as we still want to do user discovery based on the searchParams not the default organization, later the organization is determined by the found user
+                    loginSettings={contextLoginSettings}
+                    suffix={suffix}
+                    submit={submit}
+                    allowRegister={!!loginSettings?.allowRegister}
+                >
+                    {identityProviders && (
+                        <SignInWithIdp
+                            identityProviders={identityProviders}
+                            requestId={requestId}
+                            organization={organization}
+                        ></SignInWithIdp>
+                    )}
+                </UsernameForm>
+            </div>
         </DynamicTheme>
     );
-  } catch (e) {
-    console.log(e);
-    return (<div>{e.message}</div>);
-  }
-  
-
- 
 }

@@ -26,7 +26,6 @@ export async function createServiceForHost<T extends ServiceClass>(
 ) {
   let token;
 
-  console.log(JSON.stringify(process.env));
 
   // if we are running in a multitenancy context, use the system user token
   if (
@@ -46,6 +45,8 @@ export async function createServiceForHost<T extends ServiceClass>(
   if (!token) {
     throw new Error("No token found here");
   }
+  
+  console.log('VARIABLES', serviceUrl, token);
 
   const transport = createServerTransport(token, {
     baseUrl: serviceUrl,

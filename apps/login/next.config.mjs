@@ -59,6 +59,8 @@ if (process.env.ZITADEL_API_URL) {
 }
 
 const nextConfig = {
+  productionBrowserSourceMaps: true,
+  swcMinify: false,
   basePath: process.env.NEXT_PUBLIC_BASE_PATH,
   output: process.env.NEXT_OUTPUT_MODE || undefined,
   reactStrictMode: true, // Recommended for the `pages` directory, default in `app`.

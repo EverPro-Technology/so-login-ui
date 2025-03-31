@@ -65,6 +65,10 @@ const nextConfig = {
   experimental: {
     dynamicIO: true,
   },
+  env: {
+    ZITADEL_API_URL: process.env.ZITADEL_API_URL,
+    ZITADEL_SERVICE_USER_TOKEN: process.env.ZITADEL_SERVICE_USER_TOKEN,
+  },
   images: {
     remotePatterns: imageRemotePatterns,
   },

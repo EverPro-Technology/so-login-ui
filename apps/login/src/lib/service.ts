@@ -66,6 +66,7 @@ export async function createServiceForHost<T extends ServiceClass>(
           },
         ],
   });
+  console.log("after transport");
 
   return createClientFor<T>(service)(transport);
 }

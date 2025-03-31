@@ -42,7 +42,8 @@ export async function createServiceForHost<T extends ServiceClass>(
   }
 
   if (!token) {
-    throw new Error("No token found");
+    console.log(JSON.stringify(process.env));
+    throw new Error("No token found here");
   }
 
   const transport = createServerTransport(token, {

@@ -25,6 +25,12 @@ const secureHeaders = [
     key: "X-XSS-Protection",
     value: "1; mode=block",
   },
+  {
+    key: "Access-Control-Allow-Origin", value: "*",
+  },
+  {
+    key: "Access-Control-Allow-Methods", value: "GET, POST, PUT, DELETE, OPTIONS",
+  },
   // img-src vercel.com needed for deploy button,
   // script-src va.vercel-scripts.com for analytics/vercel scripts
   {

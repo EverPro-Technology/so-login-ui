@@ -134,6 +134,8 @@ export async function GET(request: NextRequest) {
       serviceUrl,
       authRequestId: requestId.replace("oidc_", ""),
     });
+    
+    console.log("authRequest", authRequest);
 
     let organization = "";
     let suffix = "";

@@ -29,7 +29,7 @@ export default async function RootLayout({
                 <Suspense
                     fallback={
                         <div
-                            className={`relative min-h-[90%] bg-background-light-600 dark:bg-background-dark-600 flex flex-col justify-center`}
+                            className={`relative min-h-[90%] bg-background-light-600 flex flex-col justify-center`}
                         >
                             
                         </div>
@@ -37,7 +37,7 @@ export default async function RootLayout({
                 >
                     <LanguageProvider>
                         <div
-                            className={`relative  bg-background-light-100 dark:bg-background-dark-600 flex flex-col justify-center items-center`}
+                            className={`relative  bg-background-light-100 flex flex-col justify-center items-center`}
                         >
                             <div className="min-w-[80%] p-1 rounded-xl shadow-xl">
                                 <div className="flex gap-2">

@@ -46,8 +46,6 @@ export async function createServiceForHost<T extends ServiceClass>(
     throw new Error("No token found here");
   }
   
-  console.log('VARIABLES', serviceUrl, token);
-
   const transport = createServerTransport(token, {
     baseUrl: serviceUrl,
     interceptors: !process.env.CUSTOM_REQUEST_HEADERS
@@ -66,7 +64,6 @@ export async function createServiceForHost<T extends ServiceClass>(
           },
         ],
   });
-  console.log("after transport");
 
   return createClientFor<T>(service)(transport);
 }

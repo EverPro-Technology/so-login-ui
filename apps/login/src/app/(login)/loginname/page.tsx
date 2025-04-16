@@ -39,18 +39,15 @@ export default async function Page(props: {
         }
     }
 
-    console.log("defaultOrganization", defaultOrganization);
     const loginSettings = await getLoginSettings({
         serviceUrl,
         organization: organization ?? defaultOrganization,
     });
-    console.log("loginSettings", loginSettings);
 
     const contextLoginSettings = await getLoginSettings({
         serviceUrl,
         organization,
     });
-    console.log("contextLoginSettings", contextLoginSettings);
 
     const identityProviders = await getActiveIdentityProviders({
         serviceUrl,
@@ -59,13 +56,10 @@ export default async function Page(props: {
         return resp.identityProviders;
     });
 
-    console.log("identityProviders", identityProviders);
-
     const branding = await getBrandingSettings({
         serviceUrl,
         organization: organization ?? defaultOrganization,
     });
-    console.log("branding", branding);
 
     return (
         <DynamicTheme branding={branding}>
@@ -80,7 +74,7 @@ export default async function Page(props: {
                     loginSettings={contextLoginSettings}
                     suffix={suffix}
                     submit={submit}
-                    allowRegister={!!loginSettings?.allowRegister}
+                    allowRegister={false}
                 >
                     {identityProviders && (
                         <SignInWithIdp

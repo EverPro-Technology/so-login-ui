@@ -1,29 +1,20 @@
 "use client";
 
-import {
-  lowerCaseValidator,
-  numberValidator,
-  symbolValidator,
-  upperCaseValidator,
-} from "@/helpers/validators";
-import {
-  changePassword,
-  resetPassword,
-  sendPassword,
-} from "@/lib/server/password";
-import { create } from "@zitadel/client";
-import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
-import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { FieldValues, useForm } from "react-hook-form";
-import { Alert, AlertType } from "./alert";
-import { BackButton } from "./back-button";
-import { Button, ButtonVariants } from "./button";
-import { TextInput } from "./input";
-import { PasswordComplexity } from "./password-complexity";
-import { Spinner } from "./spinner";
+import {lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator,} from "@/helpers/validators";
+import {changePassword, resetPassword, sendPassword,} from "@/lib/server/password";
+import {create} from "@zitadel/client";
+import {ChecksSchema} from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import {PasswordComplexitySettings} from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
+import {useTranslations} from "next-intl";
+import {useRouter} from "next/navigation";
+import {useState} from "react";
+import {FieldValues, useForm} from "react-hook-form";
+import {Alert, AlertType} from "./alert";
+import {BackButton} from "./back-button";
+import {Button, ButtonSizes, ButtonVariants} from "./button";
+import {TextInput} from "./input";
+import {PasswordComplexity} from "./password-complexity";
+import {Spinner} from "./spinner";
 
 type Inputs =
   | {
@@ -265,8 +256,8 @@ export function SetPasswordForm({
 
       {error && <Alert>{error}</Alert>}
 
-      <div className="mt-8 flex w-full flex-row items-center justify-between">
-        <BackButton data-testid="back-button" />
+      <div className="mt-4 flex w-full flex-row items-center justify-between">
+        <BackButton data-testid="back-button" text={"Cancel"}/>
         <Button
           type="submit"
           variant={ButtonVariants.Primary}
@@ -278,9 +269,10 @@ export function SetPasswordForm({
           }
           onClick={handleSubmit(submitPassword)}
           data-testid="submit-button"
+          size={ButtonSizes.Medium}
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
-          {t("set.submit")}
+          Next
         </Button>
       </div>
     </form>

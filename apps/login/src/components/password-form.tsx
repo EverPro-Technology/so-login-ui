@@ -1,18 +1,18 @@
 "use client";
 
-import { resetPassword, sendPassword } from "@/lib/server/password";
-import { create } from "@zitadel/client";
-import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
-import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { Alert, AlertType } from "./alert";
-import { BackButton } from "./back-button";
-import { Button, ButtonVariants } from "./button";
-import { TextInput } from "./input";
-import { Spinner } from "./spinner";
+import {resetPassword, sendPassword} from "@/lib/server/password";
+import {create} from "@zitadel/client";
+import {ChecksSchema} from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import {LoginSettings} from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import {useTranslations} from "next-intl";
+import {useRouter} from "next/navigation";
+import {useState} from "react";
+import {useForm} from "react-hook-form";
+import {Alert, AlertType} from "./alert";
+import {BackButton} from "./back-button";
+import {Button, ButtonSizes, ButtonVariants} from "./button";
+import {TextInput} from "./input";
+import {Spinner} from "./spinner";
 
 type Inputs = {
   password: string;
@@ -172,9 +172,10 @@ export function PasswordForm({
           disabled={loading || !formState.isValid}
           onClick={handleSubmit(submitPassword)}
           data-testid="submit-button"
+          size={ButtonSizes.Medium}
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
-          {t("verify.submit")}
+          Next
         </Button>
       </div>
     </form>

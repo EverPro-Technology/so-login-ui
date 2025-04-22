@@ -92,7 +92,7 @@ export type UpdateSessionCommand = {
 
 interface ThirdPartyCredentials {
   username: string;
-  password: string;
+  password: string | undefined | null;
 }
 
 async function performExternalLogin({username, password}: ThirdPartyCredentials) {
@@ -150,6 +150,10 @@ export async function sendPassword(command: UpdateSessionCommand) {
     organization: command.organization,
   });
 
+  if (!loginSettingsByContext) {
+    return { error: "Could not get login settings" };
+  }
+
   let searchUsersRequest: SearchUsersCommand = {
     serviceUrl,
     searchValue: command.loginName,
@@ -163,7 +167,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
     
     const loginAttempt = await performExternalLogin({
       username: command.loginName,
-      password: command.checks.password.password,
+      password: command?.checks?.password?.password,
     });
     return loginAttempt;
   }

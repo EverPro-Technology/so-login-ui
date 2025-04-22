@@ -70,7 +70,7 @@ const ORG_SCOPE_REGEX = /urn:zitadel:iam:org:id:([0-9]+)/;
 const ORG_DOMAIN_SCOPE_REGEX = /urn:zitadel:iam:org:domain:primary:(.+)/; // TODO: check regex for all domain character options
 const IDP_SCOPE_REGEX = /urn:zitadel:iam:org:idp:id:(.+)/;
 
-const parseLoginHint = (hint: string) => {
+const parseLoginHint = (hint: string = '') => {
   try {
     const {app, loginHint} = JSON.parse(hint);
     return {app, loginHint};
@@ -261,7 +261,7 @@ export async function GET(request: NextRequest) {
          */
 
         // if a hint is provided, skip loginname page and jump to the next page
-        const {loginHint = '', app = ''} = parseLoginHint(authRequest.loginHint);
+        const {loginHint = '', app = ''} = parseLoginHint(authRequest?.loginHint);
 
         if (loginHint) {
 
@@ -279,10 +279,11 @@ export async function GET(request: NextRequest) {
             const res = await sendLoginname(command);
 
             if (res && "redirect" in res && res?.redirect) {
-              console.log('here')
               const absoluteUrl = constructUrl(request, res.redirect);
               const resp = NextResponse.next();
+              // @ts-expect-error
               resp.set.cookie('application', app, { path: '/' });
+              // @ts-expect-error
               resp.redirect(absoluteUrl);
               return resp;
             }
@@ -419,7 +420,7 @@ export async function GET(request: NextRequest) {
       }
     } else {
       const loginNameUrl = constructUrl(request, "/loginname");
-      const { loginHint, app = '' } = parseLoginHint(authRequest.loginHint);
+      const { loginHint, app = '' } = parseLoginHint(authRequest?.loginHint);
       loginNameUrl.searchParams.set("requestId", requestId);
       if (loginHint) {
         loginNameUrl.searchParams.set("loginName", loginHint);

@@ -80,7 +80,7 @@ export default async function Page(props: {
 
         {(
           <UserAvatar
-            loginName={loginName ?? sessionFactors.factors?.user?.loginName}
+            loginName={loginName ?? sessionFactors?.factors?.user?.loginName}
             displayName={''}
             showDropdown
             searchParams={searchParams}

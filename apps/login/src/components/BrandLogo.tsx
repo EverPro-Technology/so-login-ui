@@ -4,7 +4,7 @@ import Image from "next/image";
 import {useEffect, useState} from "react";
 
 export default function BrandLogo() {
-    const [logo, setLogo] = useState<string>('/logo/everpro-logo.svg');
+    const [logo, setLogo] = useState<string | null>(null);
     
     useEffect(() => {
         const application = document.cookie.split('; ').find(cookie => cookie.trim().startsWith('application'))?.split('=')[1];
@@ -18,13 +18,13 @@ export default function BrandLogo() {
     }, []);
     return (
         <div className='flex basis-[75%] justify-center bg-background-light-100 shadow-xl'>
-            <Image
+            {logo && (<Image
                 src={logo}
                 alt="EverPro Logo"
                 width={314}
                 height={259}
                 sizes="100vw"
-            />
+            />)}
         </div>
     )
 }

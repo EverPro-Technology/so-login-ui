@@ -70,6 +70,15 @@ const ORG_SCOPE_REGEX = /urn:zitadel:iam:org:id:([0-9]+)/;
 const ORG_DOMAIN_SCOPE_REGEX = /urn:zitadel:iam:org:domain:primary:(.+)/; // TODO: check regex for all domain character options
 const IDP_SCOPE_REGEX = /urn:zitadel:iam:org:idp:id:(.+)/;
 
+const parseLoginHint = (hint: string) => {
+  try {
+    const {app, loginHint} = JSON.parse(hint);
+    return {app, loginHint};
+  } catch (e) {
+    return {app: '', loginHint: ''};
+  }
+}
+
 export async function GET(request: NextRequest) {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -135,7 +144,6 @@ export async function GET(request: NextRequest) {
       authRequestId: requestId.replace("oidc_", ""),
     });
     
-    console.log("authRequest", authRequest);
 
     let organization = "";
     let suffix = "";
@@ -253,10 +261,14 @@ export async function GET(request: NextRequest) {
          */
 
         // if a hint is provided, skip loginname page and jump to the next page
-        if (authRequest.loginHint) {
+        const {loginHint = '', app = ''} = parseLoginHint(authRequest.loginHint);
+
+        if (loginHint) {
+
           try {
+            
             let command: SendLoginnameCommand = {
-              loginName: authRequest.loginHint,
+              loginName: loginHint,
               requestId: authRequest.id,
             };
 
@@ -267,8 +279,12 @@ export async function GET(request: NextRequest) {
             const res = await sendLoginname(command);
 
             if (res && "redirect" in res && res?.redirect) {
+              console.log('here')
               const absoluteUrl = constructUrl(request, res.redirect);
-              return NextResponse.redirect(absoluteUrl.toString());
+              const resp = NextResponse.next();
+              resp.set.cookie('application', app, { path: '/' });
+              resp.redirect(absoluteUrl);
+              return resp;
             }
           } catch (error) {
             console.error("Failed to execute sendLoginname:", error);
@@ -279,8 +295,8 @@ export async function GET(request: NextRequest) {
         if (authRequest.id) {
           loginNameUrl.searchParams.set("requestId", `oidc_${authRequest.id}`);
         }
-        if (authRequest.loginHint) {
-          loginNameUrl.searchParams.set("loginName", authRequest.loginHint);
+        if (loginHint) {
+          loginNameUrl.searchParams.set("loginName", loginHint);
         }
         if (organization) {
           loginNameUrl.searchParams.set("organization", organization);
@@ -288,6 +304,7 @@ export async function GET(request: NextRequest) {
         if (suffix) {
           loginNameUrl.searchParams.set("suffix", suffix);
         }
+        console.log('wait here??')
         return NextResponse.redirect(loginNameUrl);
       } else if (authRequest.prompt.includes(Prompt.NONE)) {
         /**
@@ -402,10 +419,10 @@ export async function GET(request: NextRequest) {
       }
     } else {
       const loginNameUrl = constructUrl(request, "/loginname");
-
+      const { loginHint, app = '' } = parseLoginHint(authRequest.loginHint);
       loginNameUrl.searchParams.set("requestId", requestId);
-      if (authRequest?.loginHint) {
-        loginNameUrl.searchParams.set("loginName", authRequest.loginHint);
+      if (loginHint) {
+        loginNameUrl.searchParams.set("loginName", loginHint);
         loginNameUrl.searchParams.set("submit", "true"); // autosubmit
       }
 
@@ -413,8 +430,10 @@ export async function GET(request: NextRequest) {
         loginNameUrl.searchParams.append("organization", organization);
         // loginNameUrl.searchParams.set("organization", organization);
       }
-
-      return NextResponse.redirect(loginNameUrl);
+      
+      const respon = NextResponse.redirect(loginNameUrl);
+      respon.cookies.set('application', app, { path: '/' });
+      return respon;
     }
   }
   // continue with SAML

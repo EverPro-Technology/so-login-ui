@@ -78,10 +78,10 @@ export default async function Page(props: {
             </div>
           )}
 
-        {sessionFactors && (
+        {(
           <UserAvatar
             loginName={loginName ?? sessionFactors.factors?.user?.loginName}
-            displayName={sessionFactors.factors?.user?.displayName}
+            displayName={''}
             showDropdown
             searchParams={searchParams}
           ></UserAvatar>

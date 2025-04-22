@@ -50,6 +50,23 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     return { error: "Could not get login settings" };
   }
 
+
+  if (loginSettingsByContext?.ignoreUnknownUsernames) {
+    const paramsPasswordDefault = new URLSearchParams({
+      loginName: command.loginName,
+    });
+
+    if (command.requestId) {
+      paramsPasswordDefault.append("requestId", command.requestId);
+    }
+
+    if (command.organization) {
+      paramsPasswordDefault.append("organization", command.organization);
+    }
+
+    return { redirect: "/password?" + paramsPasswordDefault };
+  }
+
   let searchUsersRequest: SearchUsersCommand = {
     serviceUrl,
     searchValue: command.loginName,
@@ -437,22 +454,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
       return { redirect: "/register?" + params };
     }
-  }
-
-  if (loginSettingsByContext?.ignoreUnknownUsernames) {
-    const paramsPasswordDefault = new URLSearchParams({
-      loginName: command.loginName,
-    });
-
-    if (command.requestId) {
-      paramsPasswordDefault.append("requestId", command.requestId);
-    }
-
-    if (command.organization) {
-      paramsPasswordDefault.append("organization", command.organization);
-    }
-
-    return { redirect: "/password?" + paramsPasswordDefault };
   }
 
   // fallbackToPassword

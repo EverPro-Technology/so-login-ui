@@ -15,6 +15,8 @@ import {
   passwordReset,
   setPassword,
   setUserPassword,
+    searchUsers,
+  SearchUsersCommand,
 } from "@/lib/zitadel";
 import { ConnectError, create } from "@zitadel/client";
 import { createServerTransport } from "@zitadel/client/node";
@@ -87,9 +89,84 @@ export type UpdateSessionCommand = {
   requestId?: string;
 };
 
+
+interface ThirdPartyCredentials {
+  username: string;
+  password: string;
+}
+
+async function performExternalLogin({username, password}: ThirdPartyCredentials) {
+  const loginMutation = `mutation Login($email: String, $password: String, $type: String) {
+  login(email: $email, password: $password, type: $type) {
+    authenticated
+    companyId
+    companyUserId
+    firstName
+    lastName
+    token
+    errors
+    enterpriseId
+    enterpriseUserId
+    expired
+    partnerAccountId
+    partnerUserId
+    __typename
+    }
+  }`
+
+  const variables = {
+    email: username,
+    password: password,
+    type: "company",
+  };
+  
+  const response = await fetch("http://localhost:3000/graphql", {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({query: loginMutation, variables}),
+  });
+  
+  if (!response.ok) {
+    return { error: "Failed to login" };
+  }
+  
+  const data = await response.json();
+  
+  // TODO: THIS logic if for customer lobby only need to standard it.
+  if ( data.data.login.authenticated === false) {
+    return { error: "Failed to login" };
+  }
+  
+  // TODO: MAKE THIS ENVIRONMENT DRIVEN.
+  return { redirect: `http://localhost:3004/auth/_cb/everpro?token=${data.data.login.token}` };
+}
+
 export async function sendPassword(command: UpdateSessionCommand) {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+
+  const loginSettingsByContext = await getLoginSettings({
+    serviceUrl,
+    organization: command.organization,
+  });
+
+  let searchUsersRequest: SearchUsersCommand = {
+    serviceUrl,
+    searchValue: command.loginName,
+    organizationId: command.organization,
+    loginSettings: loginSettingsByContext
+  };
+
+  const searchResult = await searchUsers(searchUsersRequest);
+  if ("error" in searchResult && searchResult.error) {
+    // call customer lobby login? 
+    
+    const loginAttempt = await performExternalLogin({
+      username: command.loginName,
+      password: command.checks.password.password,
+    });
+    return loginAttempt;
+  }
 
   let sessionCookie = await getSessionCookieByLoginName({
     loginName: command.loginName,

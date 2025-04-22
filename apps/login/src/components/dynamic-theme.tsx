@@ -15,7 +15,7 @@ export function DynamicTheme({
 }) {
   return (
     <ThemeWrapper branding={branding}>
-      <div className="flex flex-col min-h-[99vh] justify-center bg-background-light-500 dark:bg-background-dark-500 px-8 py-12 shadow-xl">
+      <div className="flex flex-col min-h-[99vh] justify-center bg-background-light-500 px-8 py-12 shadow-xl">
         <div className="flex flex-col items-center justify-center space-y-4">
           <div className="relative">
             {branding && (

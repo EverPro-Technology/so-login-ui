@@ -60,14 +60,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
   const searchResult = await searchUsers(searchUsersRequest);
 
-  if ("error" in searchResult && searchResult.error) {
-    return searchResult;
-  }
-
-  if (!("result" in searchResult)) {
-    return { error: "Could not search users" };
-  }
-
   const { result: potentialUsers } = searchResult;
 
 
@@ -84,7 +76,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       paramsPasswordDefault.append("organization", command.organization);
     }
 
-    if (potentialUsers.length == 1 && potentialUsers[0].userId) {
+    if (potentialUsers?.length == 1 && potentialUsers[0]?.userId) {
       const userId = potentialUsers[0].userId;
       const checks = create(ChecksSchema, {
         user: { search: { case: "userId", value: userId } },

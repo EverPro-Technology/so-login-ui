@@ -5,7 +5,6 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { SignInWithIdp } from "@/components/sign-in-with-idp";
 import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
-import { getServiceUrlFromHeaders } from "@/lib/service";
 import { loadMostRecentSession } from "@/lib/session";
 import {
   getActiveIdentityProviders,
@@ -18,6 +17,7 @@ import {
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
+import {getServiceUrlFromHeaders} from "@/lib/headers";
 
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;

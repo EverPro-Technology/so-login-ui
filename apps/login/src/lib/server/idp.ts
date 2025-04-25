@@ -7,9 +7,9 @@ import {
 } from "@/lib/zitadel";
 import { headers } from "next/headers";
 import { getNextUrl } from "../client";
-import { getServiceUrlFromHeaders } from "../service";
 import { checkEmailVerification } from "../verify-helper";
 import { createSessionForIdpAndUpdateCookie } from "./cookie";
+import {getServiceUrlFromHeaders} from "@/lib/headers";
 
 export type StartIDPFlowCommand = {
   idpId: string;

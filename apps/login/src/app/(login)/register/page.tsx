@@ -1,6 +1,5 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { RegisterForm } from "@/components/register-form";
-import { getServiceUrlFromHeaders } from "@/lib/service";
 import {
   getBrandingSettings,
   getDefaultOrg,
@@ -11,6 +10,7 @@ import {
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
+import {getServiceUrlFromHeaders} from "@/lib/headers";
 
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;

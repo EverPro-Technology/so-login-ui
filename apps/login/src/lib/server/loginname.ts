@@ -8,7 +8,6 @@ import { idpTypeToIdentityProviderType, idpTypeToSlug } from "../idp";
 
 import { PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
-import { getServiceUrlFromHeaders } from "../service";
 import { checkInvite } from "../verify-helper";
 import {
   getActiveIdentityProviders,
@@ -22,6 +21,7 @@ import {
   startIdentityProviderFlow,
 } from "../zitadel";
 import { createSessionAndUpdateCookie } from "./cookie";
+import {getServiceUrlFromHeaders} from "@/lib/headers";
 
 export type SendLoginnameCommand = {
   loginName: string;

@@ -5,7 +5,6 @@ import { linkingSuccess } from "@/components/idps/pages/linking-success";
 import { loginFailed } from "@/components/idps/pages/login-failed";
 import { loginSuccess } from "@/components/idps/pages/login-success";
 import { idpTypeToIdentityProviderType, PROVIDER_MAPPING } from "@/lib/idp";
-import { getServiceUrlFromHeaders } from "@/lib/service";
 import {
   addHuman,
   addIDPLink,
@@ -25,6 +24,7 @@ import {
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
+import {getServiceUrlFromHeaders} from "@/lib/headers";
 
 const ORG_SUFFIX_REGEX = /(?<=@)(.+)/;
 

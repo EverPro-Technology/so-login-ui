@@ -3,7 +3,6 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { SelfServiceMenu } from "@/components/self-service-menu";
 import { UserAvatar } from "@/components/user-avatar";
 import { getMostRecentCookieWithLoginname } from "@/lib/cookies";
-import { getServiceUrlFromHeaders } from "@/lib/service";
 import {
   createCallback,
   createResponse,
@@ -21,6 +20,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import {getServiceUrlFromHeaders} from "@/lib/headers";
 
 async function loadSession(
   serviceUrl: string,

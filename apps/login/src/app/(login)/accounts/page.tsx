@@ -1,7 +1,6 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { SessionsList } from "@/components/sessions-list";
 import { getAllSessionCookieIds } from "@/lib/cookies";
-import { getServiceUrlFromHeaders } from "@/lib/service";
 import {
   getBrandingSettings,
   getDefaultOrg,
@@ -12,6 +11,7 @@ import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 import Link from "next/link";
+import {getServiceUrlFromHeaders} from "@/lib/headers";
 
 async function loadSessions({ serviceUrl }: { serviceUrl: string }) {
   const ids: (string | undefined)[] = await getAllSessionCookieIds();

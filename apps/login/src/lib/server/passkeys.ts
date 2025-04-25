@@ -22,9 +22,9 @@ import {
   getSessionCookieById,
   getSessionCookieByLoginName,
 } from "../cookies";
-import { getServiceUrlFromHeaders } from "../service";
 import { checkEmailVerification } from "../verify-helper";
 import { setSessionAndUpdateCookie } from "./cookie";
+import {getServiceUrlFromHeaders} from "@/lib/headers";
 
 type VerifyPasskeyCommand = {
   passkeyId: string;

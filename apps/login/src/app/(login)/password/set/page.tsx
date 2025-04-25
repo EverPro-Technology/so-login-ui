@@ -2,7 +2,6 @@ import { Alert, AlertType } from "@/components/alert";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { SetPasswordForm } from "@/components/set-password-form";
 import { UserAvatar } from "@/components/user-avatar";
-import { getServiceUrlFromHeaders } from "@/lib/service";
 import { loadMostRecentSession } from "@/lib/session";
 import {
   getBrandingSettings,
@@ -14,6 +13,7 @@ import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
+import {getServiceUrlFromHeaders} from "@/lib/headers";
 
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;

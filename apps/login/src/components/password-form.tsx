@@ -115,7 +115,7 @@ export function PasswordForm({
       params.append("requestId", requestId);
     }
 
-    return router.push("/password/set?" + params);
+    // return router.push("/password/set?" + params);
   }
 
   return (

@@ -4,7 +4,6 @@ import { ChooseSecondFactorToSetup } from "@/components/choose-second-factor-to-
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
-import { getServiceUrlFromHeaders } from "@/lib/service";
 import { loadMostRecentSession } from "@/lib/session";
 import {
   getBrandingSettings,
@@ -17,6 +16,7 @@ import { Timestamp, timestampDate } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
+import {getServiceUrlFromHeaders} from "@/lib/headers";
 
 function isSessionValid(session: Partial<Session>): {
   valid: boolean;

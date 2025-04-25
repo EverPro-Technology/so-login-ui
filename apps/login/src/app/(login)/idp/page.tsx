@@ -1,9 +1,9 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { SignInWithIdp } from "@/components/sign-in-with-idp";
-import { getServiceUrlFromHeaders } from "@/lib/service";
 import { getActiveIdentityProviders, getBrandingSettings } from "@/lib/zitadel";
 import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
+import {getServiceUrlFromHeaders} from "@/lib/headers";
 
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;

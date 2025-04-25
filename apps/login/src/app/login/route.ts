@@ -3,7 +3,7 @@ import { idpTypeToSlug } from "@/lib/idp";
 import { loginWithOIDCandSession } from "@/lib/oidc";
 import { loginWithSAMLandSession } from "@/lib/saml";
 import { sendLoginname, SendLoginnameCommand } from "@/lib/server/loginname";
-import { constructUrl, getServiceUrlFromHeaders } from "@/lib/service";
+import { constructUrl } from "@/lib/service";
 import { findValidSession } from "@/lib/session";
 import {
   createCallback,
@@ -25,6 +25,7 @@ import { CreateResponseRequestSchema } from "@zitadel/proto/zitadel/saml/v2/saml
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import {getServiceUrlFromHeaders} from "@/lib/headers";
 
 export const dynamic = "force-dynamic";
 export const revalidate = false;
@@ -250,6 +251,7 @@ export async function GET(request: NextRequest) {
     if (authRequest && sessions.length) {
       // if some accounts are available for selection and select_account is set
       if (authRequest.prompt.includes(Prompt.SELECT_ACCOUNT)) {
+        console.log('go to accounts')
         return gotoAccounts({
           request,
           requestId: `oidc_${authRequest.id}`,
@@ -305,7 +307,7 @@ export async function GET(request: NextRequest) {
         if (suffix) {
           loginNameUrl.searchParams.set("suffix", suffix);
         }
-        console.log('wait here??')
+        
         return NextResponse.redirect(loginNameUrl);
       } else if (authRequest.prompt.includes(Prompt.NONE)) {
         /**
@@ -362,6 +364,7 @@ export async function GET(request: NextRequest) {
         });
 
         if (!selectedSession || !selectedSession.id) {
+          console.log('no session here')
           return gotoAccounts({
             request,
             requestId: `oidc_${authRequest.id}`,
@@ -432,9 +435,7 @@ export async function GET(request: NextRequest) {
         // loginNameUrl.searchParams.set("organization", organization);
       }
       
-      const respon = NextResponse.redirect(loginNameUrl);
-      respon.cookies.set('application', app, { path: '/' });
-      return respon;
+      return NextResponse.redirect(loginNameUrl);
     }
   }
   // continue with SAML
@@ -458,6 +459,7 @@ export async function GET(request: NextRequest) {
     });
 
     if (!selectedSession || !selectedSession.id) {
+      console.log('no session found, go to accounts');
       return gotoAccounts({
         request,
         requestId: `saml_${samlRequest.id}`,
@@ -540,6 +542,7 @@ export async function GET(request: NextRequest) {
       }
     } catch (error) {
       console.error(error);
+      console.log('doubt it is here')
       return gotoAccounts({
         request,
         requestId: `saml_${samlRequest.id}`,

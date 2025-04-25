@@ -4,7 +4,6 @@ import { Button, ButtonVariants } from "@/components/button";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { TotpRegister } from "@/components/totp-register";
 import { UserAvatar } from "@/components/user-avatar";
-import { getServiceUrlFromHeaders } from "@/lib/service";
 import { loadMostRecentSession } from "@/lib/session";
 import {
   addOTPEmail,
@@ -18,6 +17,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import {getServiceUrlFromHeaders} from "@/lib/headers";
 
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;

@@ -4,7 +4,6 @@ import { UserAvatar } from "@/components/user-avatar";
 import { VerifyForm } from "@/components/verify-form";
 import { VerifyRedirectButton } from "@/components/verify-redirect-button";
 import { sendEmailCode } from "@/lib/server/verify";
-import { getServiceUrlFromHeaders } from "@/lib/service";
 import { loadMostRecentSession } from "@/lib/session";
 import {
   getBrandingSettings,
@@ -15,6 +14,7 @@ import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
+import {getServiceUrlFromHeaders} from "@/lib/headers";
 
 export default async function Page(props: { searchParams: Promise<any> }) {
   const searchParams = await props.searchParams;

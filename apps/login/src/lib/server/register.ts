@@ -10,8 +10,8 @@ import {
 } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { headers } from "next/headers";
 import { getNextUrl } from "../client";
-import { getServiceUrlFromHeaders } from "../service";
 import { checkEmailVerification } from "../verify-helper";
+import {getServiceUrlFromHeaders} from "@/lib/headers";
 
 type RegisterUserCommand = {
   email: string;

@@ -1,6 +1,7 @@
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import { getServiceUrlFromHeaders } from "./lib/service";
+
+import {getServiceUrlFromHeaders} from "@/lib/headers";
 
 export const config = {
   matcher: [
@@ -9,13 +10,36 @@ export const config = {
     "/oidc/:path*",
     "/idps/callback/:path*",
     "/saml/:path*",
-  ],
+      "/login",
+      "/accounts",
+  ], 
 };
 
-export async function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest, response : NextResponse) {
+  const urlParams = request.nextUrl.searchParams;
   // escape proxy if the environment is setup for multitenancy
   if (!process.env.ZITADEL_API_URL || !process.env.ZITADEL_SERVICE_USER_TOKEN) {
     return NextResponse.next();
+  }
+
+  if (['/login', '/accounts'].includes(request.nextUrl.pathname) && (urlParams.has("authRequest") || urlParams.has('requestId'))) {
+    const response = NextResponse.next();
+    const authRequestID = urlParams.get("authRequest") || urlParams.get('requestId');
+    
+    const authDetailsResponse = await fetch(`${request.nextUrl.origin}/auth-request-details?authRequestID=${authRequestID}`);
+    console.log(authRequestID);
+    if (!authDetailsResponse.ok) {
+      console.log('problem with hint defaulting to default application');
+      return response;
+    }
+    const authDetails = await authDetailsResponse.json();
+    
+    response.cookies.set("application", authDetails?.application, {
+      maxAge: 500 * 365 * 24 * 60 * 60,
+      path: "/"
+    });
+    
+    return response;
   }
 
   const _headers = await headers();

@@ -1,0 +1,17 @@
+{
+  "customer-lobby": {
+    "login": {},
+    "passwordReset": {
+      "url": "http://localhost:3000/graphql",
+      "type": "graphql",
+      "query": "mutation ResetPassword($email: String!, $type: String) {\n  resetPassword(email: $email, type: $type) {\n    emailNotFound\n    success\n    __typename\n  }\n}\n",
+      "params": {
+        "type": "company"
+      },
+      "variableMap": {
+        "email": "email"
+      }
+    },
+    "sessionExchange": {}
+  }
+}

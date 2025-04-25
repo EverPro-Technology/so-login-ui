@@ -19,7 +19,8 @@ import {
   getSessionCookieByLoginName,
   removeSessionFromCookie,
 } from "../cookies";
-import { getServiceUrlFromHeaders } from "../service";
+
+import {getServiceUrlFromHeaders} from "@/lib/headers";
 
 export async function skipMFAAndContinueWithNextUrl({
   userId,

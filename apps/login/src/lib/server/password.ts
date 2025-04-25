@@ -31,15 +31,17 @@ import {
   AuthenticationMethodType,
   SetPasswordRequestSchema,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { headers } from "next/headers";
+import { headers, cookies } from "next/headers";
 import { getNextUrl } from "../client";
 import { getSessionCookieById, getSessionCookieByLoginName } from "../cookies";
-import { getServiceUrlFromHeaders } from "../service";
 import {
   checkEmailVerification,
   checkMFAFactors,
   checkPasswordChangeRequired,
 } from "../verify-helper";
+
+import appConfig from "../../application-configuration.json";
+import {getServiceUrlFromHeaders} from "@/lib/headers";
 
 type ResetPasswordCommand = {
   loginName: string;
@@ -47,8 +49,47 @@ type ResetPasswordCommand = {
   requestId?: string;
 };
 
+type CLConfig = typeof appConfig['customer-lobby'];
+type ProductConfiguration = CLConfig;
+
+async function productLogin(configuration: ProductConfiguration, loginName: string) {
+  const config = configuration?.passwordReset;
+  if (config?.type === 'graphql') {
+    const mutation = config?.query;
+    const params = config?.params;
+    const emailKey = config?.variableMap?.email;
+    
+    const variables = {
+        [emailKey]: loginName,
+        ...params,
+    }
+    const response = await fetch(config?.url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({query: mutation, variables}),
+    });
+    
+    if (!response.ok) {
+      const res = await response.json();
+      console.log(res)
+      return { error: " error making request" };
+    }
+  }
+  
+  return { error: "some error" };
+}
+
 export async function resetPassword(command: ResetPasswordCommand) {
   const _headers = await headers();
+
+  const cookie = await cookies();
+  
+  const application = cookie.get('application')?.value || '';
+  let configuration = null;
+  if (application in appConfig) {
+    configuration = appConfig[application as keyof typeof appConfig];
+  }
+  
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
   const host = _headers.get("host");
 
@@ -67,8 +108,18 @@ export async function resetPassword(command: ResetPasswordCommand) {
     users.details.totalResult !== BigInt(1) ||
     !users.result[0].userId
   ) {
-    return { error: "Could not send Password Reset Link" };
+    
+    if (!configuration) {
+      return { error: "Could not send Password Reset Link" };
+    }
+    
+    return productLogin(configuration, command?.loginName);
   }
+  
+  return zitadelResetPassword(users, command, host, serviceUrl)
+}
+
+async function zitadelResetPassword(users: {result: [{userId: string}]}, command: ResetPasswordCommand, host: string, serviceUrl: string ) {
   const userId = users.result[0].userId;
 
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
@@ -77,8 +128,8 @@ export async function resetPassword(command: ResetPasswordCommand) {
     serviceUrl,
     userId,
     urlTemplate:
-      `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/password/set?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
-      (command.requestId ? `&requestId=${command.requestId}` : ""),
+        `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/password/set?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
+        (command.requestId ? `&requestId=${command.requestId}` : ""),
   });
 }
 

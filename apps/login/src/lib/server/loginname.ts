@@ -50,23 +50,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     return { error: "Could not get login settings" };
   }
 
-
-  if (loginSettingsByContext?.ignoreUnknownUsernames) {
-    const paramsPasswordDefault = new URLSearchParams({
-      loginName: command.loginName,
-    });
-
-    if (command.requestId) {
-      paramsPasswordDefault.append("requestId", command.requestId);
-    }
-
-    if (command.organization) {
-      paramsPasswordDefault.append("organization", command.organization);
-    }
-
-    return { redirect: "/password?" + paramsPasswordDefault };
-  }
-
   let searchUsersRequest: SearchUsersCommand = {
     serviceUrl,
     searchValue: command.loginName,
@@ -86,6 +69,37 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   }
 
   const { result: potentialUsers } = searchResult;
+
+
+  if (loginSettingsByContext?.ignoreUnknownUsernames) {
+    const paramsPasswordDefault = new URLSearchParams({
+      loginName: command.loginName,
+    });
+
+    if (command.requestId) {
+      paramsPasswordDefault.append("requestId", command.requestId);
+    }
+
+    if (command.organization) {
+      paramsPasswordDefault.append("organization", command.organization);
+    }
+
+    if (potentialUsers.length == 1 && potentialUsers[0].userId) {
+      const userId = potentialUsers[0].userId;
+      const checks = create(ChecksSchema, {
+        user: { search: { case: "userId", value: userId } },
+      });
+
+      await createSessionAndUpdateCookie({
+        checks,
+        requestId: command.requestId,
+      });
+    }
+
+    return { redirect: "/password?" + paramsPasswordDefault };
+  }
+
+  
 
   const redirectUserToSingleIDPIfAvailable = async () => {
     const identityProviders = await getActiveIdentityProviders({

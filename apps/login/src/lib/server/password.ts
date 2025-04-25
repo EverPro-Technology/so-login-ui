@@ -28,7 +28,7 @@ import {
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { User, UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import {
-  AuthenticationMethodType,
+  AuthenticationMethodType, ListUsersResponse,
   SetPasswordRequestSchema,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { headers, cookies } from "next/headers";
@@ -119,7 +119,7 @@ export async function resetPassword(command: ResetPasswordCommand) {
   return zitadelResetPassword(users, command, host, serviceUrl)
 }
 
-async function zitadelResetPassword(users: {result: [{userId: string}]}, command: ResetPasswordCommand, host: string, serviceUrl: string ) {
+async function zitadelResetPassword(users: ListUsersResponse, command: ResetPasswordCommand, host: string, serviceUrl: string ) {
   const userId = users.result[0].userId;
 
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";

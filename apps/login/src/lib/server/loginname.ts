@@ -58,11 +58,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     suffix: command.suffix,
   };
 
-  const searchResult = await searchUsers(searchUsersRequest);
-
-  const { result: potentialUsers } = searchResult;
-
-
   if (loginSettingsByContext?.ignoreUnknownUsernames) {
     const paramsPasswordDefault = new URLSearchParams({
       loginName: command.loginName,
@@ -76,22 +71,39 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       paramsPasswordDefault.append("organization", command.organization);
     }
 
-    if (potentialUsers?.length == 1 && potentialUsers[0]?.userId) {
-      const userId = potentialUsers[0].userId;
-      const checks = create(ChecksSchema, {
-        user: { search: { case: "userId", value: userId } },
-      });
+    const searchResult = await searchUsers(searchUsersRequest);
+    
 
-      await createSessionAndUpdateCookie({
-        checks,
-        requestId: command.requestId,
-      });
+    if (!("error" in searchResult)) {
+      const { result: potentialUsers } = searchResult;
+      if (potentialUsers?.length == 1 && potentialUsers[0]?.userId) {
+        const userId = potentialUsers[0].userId;
+        const checks = create(ChecksSchema, {
+          user: { search: { case: "userId", value: userId } },
+        });
+
+        await createSessionAndUpdateCookie({
+          checks,
+          requestId: command.requestId,
+        });
+      }
     }
 
     return { redirect: "/password?" + paramsPasswordDefault };
   }
 
+
+  const searchResult = await searchUsers(searchUsersRequest);
+
+  if ("error" in searchResult && searchResult.error) {
+    return searchResult;
+  }
+
+  if (!("result" in searchResult)) {
+    return { error: "Could not search users" };
+  }
   
+  const { result: potentialUsers } = searchResult;
 
   const redirectUserToSingleIDPIfAvailable = async () => {
     const identityProviders = await getActiveIdentityProviders({

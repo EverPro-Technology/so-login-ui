@@ -1,6 +1,10 @@
 {
   "customer-lobby": {
-    "login": {},
+    "login": {
+      "url": "http://localhost:3000/sso_login",
+      "method": "POST",
+      "tokenIdentifier": "cl"
+    },
     "passwordReset": {
       "url": "http://localhost:3000/graphql",
       "type": "graphql",
@@ -12,6 +16,8 @@
         "email": "email"
       }
     },
-    "sessionExchange": {}
+    "sessionExchange": {
+      "url": "http://localhost:3004/auth/_cb/everpro"
+    }
   }
 }

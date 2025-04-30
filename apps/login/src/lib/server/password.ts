@@ -49,10 +49,10 @@ type ResetPasswordCommand = {
   requestId?: string;
 };
 
-type CLConfig = typeof appConfig['customer-lobby'];
-type ProductConfiguration = CLConfig;
+export type CLConfig = typeof appConfig['customer-lobby'];
+export type ProductConfiguration = CLConfig;
 
-async function productLogin(configuration: ProductConfiguration, loginName: string) {
+async function productResetPassword(configuration: ProductConfiguration, loginName: string) {
   const config = configuration?.passwordReset;
   if (config?.type === 'graphql') {
     const mutation = config?.query;
@@ -113,7 +113,7 @@ export async function resetPassword(command: ResetPasswordCommand) {
       return { error: "Could not send Password Reset Link" };
     }
     
-    return productLogin(configuration, command?.loginName);
+    return productResetPassword(configuration, command?.loginName);
   }
   
   return zitadelResetPassword(users, command, host, serviceUrl)
@@ -146,35 +146,24 @@ interface ThirdPartyCredentials {
   password: string | undefined | null;
 }
 
-async function performExternalLogin({username, password}: ThirdPartyCredentials) {
-  const loginMutation = `mutation Login($email: String, $password: String, $type: String) {
-  login(email: $email, password: $password, type: $type) {
-    authenticated
-    companyId
-    companyUserId
-    firstName
-    lastName
-    token
-    errors
-    enterpriseId
-    enterpriseUserId
-    expired
-    partnerAccountId
-    partnerUserId
-    __typename
-    }
-  }`
-
+async function performExternalLogin(config: ProductConfiguration, {username, password}: ThirdPartyCredentials) {
+  const loginURL = config?.login?.url;
+  const tokenIdentifier = config?.login?.tokenIdentifier;
+  const sessionExchangeURL = config?.sessionExchange?.url;
+  
+  if (!loginURL || !sessionExchangeURL || !tokenIdentifier) {
+    return { error: "Could not verify password" };
+  }
+  
   const variables = {
-    email: username,
-    password: password,
-    type: "company",
+    username,
+    password
   };
   
-  const response = await fetch("http://localhost:3000/graphql", {
+  const response = await fetch(loginURL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({query: loginMutation, variables}),
+    body: JSON.stringify(variables),
   });
   
   if (!response.ok) {
@@ -183,13 +172,11 @@ async function performExternalLogin({username, password}: ThirdPartyCredentials)
   
   const data = await response.json();
   
-  // TODO: THIS logic if for customer lobby only need to standard it.
-  if ( data.data.login.authenticated === false) {
+  if (!data.authenticated) {
     return { error: "Failed to login" };
   }
   
-  // TODO: MAKE THIS ENVIRONMENT DRIVEN.
-  return { redirect: `http://localhost:3004/auth/_cb/everpro?token=${data.data.login.token}` };
+  return { redirect: `${sessionExchangeURL}?type=${tokenIdentifier}&token=${data?.token}` };
 }
 
 export async function sendPassword(command: UpdateSessionCommand) {
@@ -214,9 +201,19 @@ export async function sendPassword(command: UpdateSessionCommand) {
 
   const searchResult = await searchUsers(searchUsersRequest);
   if ("error" in searchResult && searchResult.error) {
-    // call customer lobby login? 
+    const cookie = await cookies();
+    const application = cookie.get('application')?.value || '';
     
-    const loginAttempt = await performExternalLogin({
+    let configuration = null;
+    if (application in appConfig) {
+      configuration = appConfig[application as keyof typeof appConfig];
+    }
+
+    if (!configuration) {
+      return { error: "Could not verify password" };
+    }
+    
+    const loginAttempt = await performExternalLogin(configuration, {
       username: command.loginName,
       password: command?.checks?.password?.password,
     });

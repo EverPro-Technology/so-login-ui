@@ -6,15 +6,7 @@
       "tokenIdentifier": "cl"
     },
     "passwordReset": {
-      "url": "http://localhost:3000/graphql",
-      "type": "graphql",
-      "query": "mutation ResetPassword($email: String!, $type: String) {\n  resetPassword(email: $email, type: $type) {\n    emailNotFound\n    success\n    __typename\n  }\n}\n",
-      "params": {
-        "type": "company"
-      },
-      "variableMap": {
-        "email": "email"
-      }
+      "url": "http://localhost:3000/sso_reset_password"
     },
     "sessionExchange": {
       "url": "http://localhost:3004/auth/_cb/everpro"

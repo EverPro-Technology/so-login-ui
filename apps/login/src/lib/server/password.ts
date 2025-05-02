@@ -54,29 +54,21 @@ export type ProductConfiguration = CLConfig;
 
 async function productResetPassword(configuration: ProductConfiguration, loginName: string) {
   const config = configuration?.passwordReset;
-  if (config?.type === 'graphql') {
-    const mutation = config?.query;
-    const params = config?.params;
-    const emailKey = config?.variableMap?.email;
-    
-    const variables = {
-        [emailKey]: loginName,
-        ...params,
-    }
-    const response = await fetch(config?.url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({query: mutation, variables}),
-    });
-    
-    if (!response.ok) {
-      const res = await response.json();
-      console.log(res)
-      return { error: " error making request" };
-    }
+  const resetPasswordURl = config?.url;
+
+  const variables = {
+    username: loginName
   }
-  
-  return { error: "some error" };
+
+  const response = await fetch(resetPasswordURl, {
+    method: 'POST',
+    body: JSON.stringify(variables),
+  });
+
+  if (!response.ok) {
+    const res = await response.json();
+    return { error: "error making request" };
+  }
 }
 
 export async function resetPassword(command: ResetPasswordCommand) {

@@ -140,10 +140,9 @@ interface ThirdPartyCredentials {
 
 async function performExternalLogin(config: ProductConfiguration, {username, password}: ThirdPartyCredentials) {
   const loginURL = config?.login?.url;
-  const tokenIdentifier = config?.login?.tokenIdentifier;
   const sessionExchangeURL = config?.sessionExchange?.url;
   
-  if (!loginURL || !sessionExchangeURL || !tokenIdentifier) {
+  if (!loginURL || !sessionExchangeURL) {
     return { error: "Could not verify password" };
   }
   
@@ -168,7 +167,7 @@ async function performExternalLogin(config: ProductConfiguration, {username, pas
     return { error: "Failed to login" };
   }
   
-  return { redirect: `${sessionExchangeURL}?type=${tokenIdentifier}&token=${data?.token}` };
+  return { redirect: `${sessionExchangeURL}?type=native&token=${data?.token}` };
 }
 
 export async function sendPassword(command: UpdateSessionCommand) {

@@ -42,6 +42,7 @@ import {
 
 import appConfig from "../../application-configuration.json";
 import {getServiceUrlFromHeaders} from "@/lib/headers";
+import {getAppConfiguration} from "@/lib/app-configuration";
 
 type ResetPasswordCommand = {
   loginName: string;
@@ -49,12 +50,9 @@ type ResetPasswordCommand = {
   requestId?: string;
 };
 
-export type CLConfig = typeof appConfig['customer-lobby'];
-export type ProductConfiguration = CLConfig;
-
-async function productResetPassword(configuration: ProductConfiguration, loginName: string) {
-  const config = configuration?.passwordReset;
-  const resetPasswordURl = config?.url;
+async function productResetPassword(application: string, loginName: string) {
+  const configuration = await getAppConfiguration(application);
+  const resetPasswordURl = configuration.passwordReset.url;
 
   const variables = {
     username: loginName
@@ -77,10 +75,6 @@ export async function resetPassword(command: ResetPasswordCommand) {
   const cookie = await cookies();
   
   const application = cookie.get('application')?.value || '';
-  let configuration = null;
-  if (application in appConfig) {
-    configuration = appConfig[application as keyof typeof appConfig];
-  }
   
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
   const host = _headers.get("host");
@@ -101,11 +95,7 @@ export async function resetPassword(command: ResetPasswordCommand) {
     !users.result[0].userId
   ) {
     
-    if (!configuration) {
-      return { error: "Could not send Password Reset Link" };
-    }
-    
-    return productResetPassword(configuration, command?.loginName);
+    return productResetPassword(application, command?.loginName);
   }
   
   return zitadelResetPassword(users, command, host, serviceUrl)
@@ -138,9 +128,11 @@ interface ThirdPartyCredentials {
   password: string | undefined | null;
 }
 
-async function performExternalLogin(config: ProductConfiguration, {username, password}: ThirdPartyCredentials) {
-  const loginURL = config?.login?.url;
-  const sessionExchangeURL = config?.sessionExchange?.url;
+async function performExternalLogin(application: string, {username, password}: ThirdPartyCredentials) {
+  
+  const configuration = await getAppConfiguration(application);
+  const loginURL = configuration.login.url;
+  const sessionExchangeURL = configuration.sessionExchange.url;
   
   if (!loginURL || !sessionExchangeURL) {
     return { error: "Could not verify password" };
@@ -195,16 +187,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
     const cookie = await cookies();
     const application = cookie.get('application')?.value || '';
     
-    let configuration = null;
-    if (application in appConfig) {
-      configuration = appConfig[application as keyof typeof appConfig];
-    }
-
-    if (!configuration) {
-      return { error: "Could not verify password" };
-    }
-    
-    const loginAttempt = await performExternalLogin(configuration, {
+    const loginAttempt = await performExternalLogin(application, {
       username: command.loginName,
       password: command?.checks?.password?.password,
     });

@@ -12,7 +12,10 @@
     "ZITADEL_API_URL",
     "ZITADEL_SERVICE_USER_TOKEN",
     "NEXT_PUBLIC_BASE_PATH",
-    "CUSTOM_REQUEST_HEADERS"
+    "CUSTOM_REQUEST_HEADERS",
+    "S3_REGION",
+    "AWS_BUCKET_NAME",
+    "AWS_CONFIG_FOLDER"
   ],
   "tasks": {
     "generate": {

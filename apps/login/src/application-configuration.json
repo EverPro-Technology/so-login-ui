@@ -1,15 +1,11 @@
 {
-  "customer-lobby": {
-    "login": {
-      "url": "http://localhost:3000/sso_login",
-      "method": "POST",
-      "tokenIdentifier": "cl"
-    },
-    "passwordReset": {
-      "url": "http://localhost:3000/sso_reset_password"
-    },
-    "sessionExchange": {
-      "url": "http://localhost:3004/auth/_cb/everpro"
-    }
+  "login": {
+    "url": "http://localhost:3000/sso_login"
+  },
+  "passwordReset": {
+    "url": "http://localhost:3000/sso_reset_password"
+  },
+  "sessionExchange": {
+    "url": "http://localhost:3004/auth/_cb/everpro"
   }
 }
